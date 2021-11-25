@@ -9,7 +9,14 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { createEventEndpoint, ICalendar, IEditingEvent } from './backend';
+import {
+  createEventEndpoint,
+  deleteEventEndpoint,
+  ICalendar,
+  IEditingEvent,
+  updateEventEndpoint,
+} from './backend';
+import { Box } from '@mui/material';
 
 interface IEventFormDialogProps {
   event: IEditingEvent | null;
@@ -33,6 +40,8 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
     setErrors({});
   }, [props.event]);
 
+  const isNew = !event?.id;
+
   function validate(): boolean {
     if (event) {
       const currentErrors: IValidationErrors = {};
@@ -53,8 +62,18 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
     evt.preventDefault();
     if (event) {
       if (validate()) {
-        createEventEndpoint(event!).then(props.onSave);
+        if (isNew) {
+          createEventEndpoint(event).then(props.onSave);
+        } else {
+          updateEventEndpoint(event).then(props.onSave);
+        }
       }
+    }
+  }
+
+  function deleteEvent() {
+    if (event) {
+      deleteEventEndpoint(event.id!).then(props.onSave);
     }
   }
 
@@ -62,7 +81,7 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
     <div>
       <Dialog open={!!event} onClose={props.onCancel}>
         <form onSubmit={save}>
-          <DialogTitle>Criar Evento</DialogTitle>
+          <DialogTitle>{isNew ? 'CriarEvento' : 'Editar Evento'}</DialogTitle>
           <DialogContent>
             {event && (
               <>
@@ -126,6 +145,12 @@ export default function EventFormDialog(props: IEventFormDialogProps) {
             )}
           </DialogContent>
           <DialogActions>
+            {!isNew && (
+              <Button type="button" onClick={deleteEvent}>
+                Excluir
+              </Button>
+            )}
+            <Box flex="1"></Box>
             <Button type="button" onClick={props.onCancel}>
               Cancelar
             </Button>

@@ -41,3 +41,23 @@ export function createEventEndpoint(event: IEditingEvent): Promise<IEvent> {
     return resp.json();
   });
 }
+
+export function updateEventEndpoint(event: IEditingEvent): Promise<IEvent> {
+  return fetch(`http://localhost:8080/events/${event.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(event),
+  }).then(resp => {
+    return resp.json();
+  });
+}
+
+export function deleteEventEndpoint(eventId: number): Promise<IEvent> {
+  return fetch(`http://localhost:8080/events/${eventId}`, {
+    method: 'DELETE',
+  }).then(resp => {
+    return resp.json();
+  });
+}

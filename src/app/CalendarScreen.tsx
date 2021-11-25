@@ -19,7 +19,6 @@ export default function CalendarScreen() {
   const { month } = useParams<{ month: string }>();
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [calendarsSelected, setCalendarsSelected] = useState<boolean[]>([]);
-  const [open, setOpen] = useState<boolean>(false);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [editingEvent, setEditingEvent] = useState<IEditingEvent | null>(null);
   const weeks = generateCalendar(
@@ -52,12 +51,16 @@ export default function CalendarScreen() {
     setCalendarsSelected(newValue);
   }
 
-  function OpenNewEvent() {
+  function openNewEvent(date: string) {
     setEditingEvent({
       date: getToday(),
       desc: '',
       calendarId: calendars[0].id,
     });
+  }
+
+  function updateEvent(event: IEvent) {
+    setEditingEvent(event);
   }
 
   return (
@@ -69,7 +72,7 @@ export default function CalendarScreen() {
       >
         <h2>Agenda React</h2>
 
-        <Button variant="contained" onClick={OpenNewEvent}>
+        <Button variant="contained" onClick={() => openNewEvent(getToday())}>
           Novo Evento
         </Button>
 
@@ -82,7 +85,11 @@ export default function CalendarScreen() {
 
       <Box flex="1" display="flex" flexDirection="column">
         <CalendarHeader month={month} />
-        <Calendar weeks={weeks} />
+        <Calendar
+          weeks={weeks}
+          onClickDay={openNewEvent}
+          onClickEvent={setEditingEvent}
+        />
         <EventFormDialog
           event={editingEvent}
           onCancel={() => setEditingEvent(null)}

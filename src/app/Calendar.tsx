@@ -11,9 +11,17 @@ const DAYS_OF_WEEK = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
 
 interface ICalendarProps {
   weeks: ICalendarCell[][];
+  onClickDay: (date: string) => void;
+  onClickEvent: (event: IEvent) => void;
 }
 export default function Calendar(props: ICalendarProps) {
   const { weeks } = props;
+
+  function handleClick(evt: React.MouseEvent, date: string) {
+    if (evt.target === evt.currentTarget) {
+      props.onClickDay(date);
+    }
+  }
   return (
     <TableContainer component={'div'}>
       <Table>
@@ -30,24 +38,36 @@ export default function Calendar(props: ICalendarProps) {
           {weeks.map((week, i) => (
             <TableRow key={i}>
               {week.map(cell => (
-                <TableCell align="center" key={cell.date}>
+                <TableCell
+                  align="center"
+                  key={cell.date}
+                  onClick={me => handleClick(me, cell.date)}
+                >
                   <div>{cell.dayOfMonth}</div>
-                  {cell.events.map(event => (
-                    <button key={event.id}>
-                      {event.time && (
-                        <Icon fontSize="inherit">watch_later</Icon>
-                      )}
-                      {event.time && (
-                        <Box component="span" margin="0 4px">
-                          {event.time}
-                        </Box>
-                      )}
-                      <span>{event.desc}</span>
-                    </button>
-                  ))}
+                  {cell.events.map(event => {
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => props.onClickEvent(event)}
+                      >
+                        {event.time && (
+                          <>
+                            <Icon fontSize="inherit">watch_later</Icon>
+                            <Box component="span" margin="0 4px">
+                              {event.time}
+                            </Box>
+                          </>
+                        )}
+                        {event.time ? (
+                          <span>{event.desc}</span>
+                        ) : (
+                          <span>{event.desc}</span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </TableCell>
               ))}
-              <TableCell component="th" scope="row"></TableCell>
             </TableRow>
           ))}
         </TableBody>
